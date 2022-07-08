@@ -1,9 +1,11 @@
+from __future__ import annotations
 from sqlalchemy import Column, String
 from sqlalchemy.orm import backref, relationship
 from sqlalchemy.dialects.postgresql import UUID
 
 from src.db import Base, db_session
 
+import bcrypt
 import uuid
 
 
@@ -14,21 +16,26 @@ class User(Base):
     password = Column(String(255), nullable=False)
     email = Column(String(255), nullable=False)
 
-    fridge_entries = relationship(
-        "User", backref=backref("fridge_entry"), cascade="all, delete"
-    )
+    # fridge_entries = relationship(
+    #     "FridgeEntry", backref=backref("fridge_entry"), cascade="all, delete"
+    # )
     recipes = relationship(
-        "User", backref=backref("recipe"), cascade="all, delete"
+        "Recipe", cascade="all, delete"
     )
 
     def __init__(self, username: str, password: str, email: str):
         self.username = username
-        self.password = password
         self.email = email
+        
+        pwd_bytes = str.encode(password)
+        pwd_hash = bcrypt.hashpw(pwd_bytes, bcrypt.gensalt())
+        self.password = str(pwd_hash)
+        
+        # to check: bcrypt.checkpw(pwd_bytes, pwd_hash)
 
     # TODO check if the UUID conversion can be carried out in the comprehension
     def json(self):
-        user = {c.category: getattr(self, c.category) for c in self.__table__.columns}
+        user = {col.name: getattr(self, col.name) for col in self.__table__.columns}
         user["id"] = str(user["id"])
         return user
 
@@ -41,5 +48,13 @@ class User(Base):
         db_session.commit()
 
     @staticmethod
-    def get(user_id):
+    def get(user_id) -> User:
         return User.query.get(user_id)
+
+    @staticmethod
+    def get_by_email(user_email) -> User:
+        return User.query.filter_by(email=user_email).first()
+    
+    @staticmethod
+    def email_exists(user_email) -> bool:
+        return User.query.filter_by(email=user_email).first() is not None

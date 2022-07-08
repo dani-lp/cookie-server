@@ -1,8 +1,10 @@
+from __future__ import annotations
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.dialects.postgresql import UUID
-from src.db import Base, db_session
 from typing import List
+
+from src.db import Base, db_session
 import uuid
 
 class Unit(Base):
@@ -11,14 +13,14 @@ class Unit(Base):
     name = Column(String(255), nullable=False)
     
     # TODO check if this is needed
-    ingredients = relationship('Ingredient', backref=backref('unit'), cascade='all, delete')
+    # ingredients = relationship('Ingredient', backref=backref('unit'), cascade='all, delete')
     
     def __init__(self, name: str):
         self.name = name
     
     # TODO check if the UUID conversion can be carried out in the comprehension
     def json(self):
-        unit = {c.category: getattr(self, c.category) for c in self.__table__.columns}
+        unit = {col.name: getattr(self, col.name) for col in self.__table__.columns}
         unit['id'] = str(unit['id'])
         return unit
     
@@ -31,5 +33,9 @@ class Unit(Base):
         db_session.commit()
     
     @staticmethod
-    def get(unit_id):
+    def all() -> List[Unit]:
+        return Unit.query.all()
+    
+    @staticmethod
+    def get(unit_id) -> Unit:
         return Unit.query.get(unit_id)

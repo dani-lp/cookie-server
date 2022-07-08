@@ -1,3 +1,4 @@
+from __future__ import annotations
 from sqlalchemy import Column, ForeignKey, Integer, String 
 from sqlalchemy.dialects.postgresql import TEXT, UUID
 from src.db import Base, db_session
@@ -9,8 +10,8 @@ class FridgeEntry(Base):
     quantity = Column(Integer(), nullable=False)
     info = Column(TEXT(), nullable=True)
     
-    user = Column(UUID(as_uuid=True), ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
-    ingredient = Column(UUID(as_uuid=True), ForeignKey('ingredient.id', ondelete='CASCADE'), nullable=False)
+    # user = Column(UUID(as_uuid=True), ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
+    # ingredient = Column(UUID(as_uuid=True), ForeignKey('ingredient.id', ondelete='CASCADE'), nullable=False)
     
     def __init__(self, username: str, password: str, email: str):
         self.username = username
@@ -19,7 +20,7 @@ class FridgeEntry(Base):
     
     # TODO check if the UUID conversion can be carried out in the comprehension
     def json(self):
-        entry = {c.category: getattr(self, c.category) for c in self.__table__.columns}
+        entry = {col.name: getattr(self, col.name) for col in self.__table__.columns}
         entry['id'] = str(entry['id'])
         entry['user'] = str(entry['user'])
         entry['ingredient'] = str(entry['ingredient'])
@@ -34,5 +35,5 @@ class FridgeEntry(Base):
         db_session.commit()
     
     @staticmethod
-    def get(recipe_id):
+    def get(recipe_id) -> FridgeEntry:
         return FridgeEntry.query.get(recipe_id)
