@@ -27,7 +27,7 @@ class FridgeEntry(Base):
         return entry
     
     def __repr__(self):
-        return f'<FridgeEntry {self.name!r}>'
+        return f'<FridgeEntry {self.info!r}>'
     
     def save(self):
         if not self.id:

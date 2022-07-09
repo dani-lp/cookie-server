@@ -34,7 +34,7 @@ class Recipe(Base):
         return recipe
 
     def __repr__(self):
-        return f"<Recipe {self.name!r}>"
+        return f"<Recipe {self.title!r}>"
 
     def save(self):
         if not self.id:

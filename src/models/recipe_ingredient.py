@@ -39,7 +39,7 @@ class RecipeIngredient(Base):
 
     # TODO improve readability
     def __repr__(self):
-        return f"<RecipeIngredient {self.name!r}>"
+        return f"<RecipeIngredient {self.id!r}>"
 
     def save(self):
         if not self.id:

@@ -27,9 +27,8 @@ class User(Base):
         self.username = username
         self.email = email
         
-        pwd_bytes = str.encode(password)
-        pwd_hash = bcrypt.hashpw(pwd_bytes, bcrypt.gensalt())
-        self.password = str(pwd_hash)
+        pwd_hash = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())
+        self.password = pwd_hash.decode('utf8')
         
         # to check: bcrypt.checkpw(pwd_bytes, pwd_hash)
 
@@ -37,10 +36,11 @@ class User(Base):
     def json(self):
         user = {col.name: getattr(self, col.name) for col in self.__table__.columns}
         user["id"] = str(user["id"])
+        del user["password"]
         return user
 
     def __repr__(self):
-        return f"<User {self.name!r}>"
+        return f"<User {self.username!r}>"
 
     def save(self):
         if not self.id:
@@ -58,3 +58,9 @@ class User(Base):
     @staticmethod
     def email_exists(user_email) -> bool:
         return User.query.filter_by(email=user_email).first() is not None
+
+    @staticmethod
+    def delete_one(user_id):
+        to_delete = User.query.get(user_id)
+        db_session.delete(to_delete)
+        db_session.commit()

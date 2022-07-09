@@ -34,7 +34,7 @@ def test_users_get_deleted_user(test_user, client):
 
     response = client.get("/auth/self", headers={"Authorization": f"bearer {token}"})
 
-    assert response.status_code == 404
+    assert response.status_code == 401
 
 
 # PUT tests
@@ -74,7 +74,7 @@ def test_users_put_deleted_user(test_user, client):
 
     response = client.put("/auth/self", headers={"Authorization": f"bearer {token}"})
 
-    assert response.status_code == 404
+    assert response.status_code == 401
 
 
 # DELETE tests
@@ -106,4 +106,4 @@ def test_users_delete_deleted_user(test_user, client):
 
     response = client.delete("/auth/self", headers={"Authorization": f"bearer {token}"})
 
-    assert response.status_code == 404
+    assert response.status_code == 401

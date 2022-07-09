@@ -1,8 +1,17 @@
 from flask import request
 from flask.views import MethodView
+from marshmallow import fields, Schema, ValidationError
 from src.utils.auth import get_user_from_token
 from src.utils.validation import not_none
 from src.models.user import User
+
+
+class UserSchema(Schema):
+    username = fields.Str()
+    email = fields.Str()
+    password = fields.Str()
+
+user_schema = UserSchema()
 
 
 class UsersSelfAPI(MethodView):
@@ -14,39 +23,35 @@ class UsersSelfAPI(MethodView):
 
         return user.json()
 
-    # def put(self):
-    #     user_id = decode_request_jwt(request)
+    def put(self):
+        user = get_user_from_token(request)
 
-    #     if not user_id:
-    #         return {'error': 'invalid JWT'}, 401
+        if not user:
+            return {'error': 'user does not exist'}, 401
 
-    #     user = User.get(user_id)
+        json_data = request.get_json()
+        if not json_data:
+            return {"error": "no input data provided"}, 400
 
-    #     if not user:
-    #         return {'error': 'user does not exist'}, 404
+        try:
+            data = user_schema.load(json_data)
+        except ValidationError as err:
+            return err.messages, 400        
 
-    #     data = UsersSelf.edit_parser.parse_args()
+        user.username = not_none(data.get('username'), user.username)
+        user.email = not_none(data.get('email'), user.email)
+        
+        # user.password = not_none(data.get('password'), user.password) # TODO hashing
 
-    #     user.username = not_none(data.get('username'), user.username)
-    #     user.name = not_none(data.get('name'), user.name)
-    #     user.email = not_none(data.get('email'), user.email)
-    #     user.password = not_none(data.get('password'), user.password)
-    #     user.birth_date = not_none(data.get('birthDate'), user.birth_date)
+        user.save()
 
-    #     user.save()
+        return user.json(), 200
 
-    #     return user.json(), 200
+    def delete(self):
+        user = get_user_from_token(request)
 
-    # def delete(self):
-    #     user_id = decode_request_jwt(request)
+        if not user:
+            return {'error' : 'user does not exist'}, 401
 
-    #     if not user_id:
-    #         return {'error': 'invalid JWT'}, 401
-
-    #     user = User.get(user_id)
-
-    #     if not user:
-    #         return {'error' : 'user does not exist'}, 404
-
-    #     User.delete_one(user_id)
-    #     return {'result' : 'success'}, 204
+        User.delete_one(user.id)
+        return {'result' : 'success'}, 204

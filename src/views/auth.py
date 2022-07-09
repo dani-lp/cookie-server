@@ -1,4 +1,4 @@
-from flask import make_response, request
+from flask import abort, make_response, request
 from flask.views import MethodView
 from marshmallow import fields, Schema, ValidationError
 from src.config import app_secret
@@ -23,11 +23,12 @@ login_schema = LoginSchema()
 register_schema = RegisterSchema()
 
 
-def valid_login(password_hash, password):
-    # TODO https://stackoverflow.com/questions/34548846/flask-bcrypt-valueerror-invalid-salt
-    pwd_bytes = str.encode(password)
-    hash_bytes = str.encode(password_hash)
-    return bcrypt.checkpw(pwd_bytes, hash_bytes)
+def valid_login(password_hash: str, password: str):
+    try:
+        return bcrypt.checkpw(password.encode('utf8'), password_hash.encode('utf8'))
+    except ValueError as err:
+        response = make_response(str(err), 401)
+        abort(response)
 
 
 class LoginAPI(MethodView):
@@ -41,7 +42,7 @@ class LoginAPI(MethodView):
         except ValidationError as err:
             return err.messages, 400
 
-        user = User.get_by_email(data.get("email"))  # TODO implement
+        user = User.get_by_email(data.get("email"))
 
         if not user:
             return {"error": "user does not exist"}, 404

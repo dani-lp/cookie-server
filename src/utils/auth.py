@@ -14,9 +14,8 @@ def get_user_from_token(request) -> User or None:
         return None
 
     try:
-        decoded_user = jwt.decode(token, app_secret, algorithms=["HS256"]).get('user')
-        user_email = decoded_user.get('email')
-        user = User.get_by_email(user_email)
+        decoded_user_id = jwt.decode(token, app_secret, algorithms=["HS256"]).get('user_id')
+        user = User.get(decoded_user_id)
         return user
     except jwt.InvalidSignatureError as err:
         print(err)

@@ -11,9 +11,9 @@ init_db()
 
 app.config['DEBUG'] = True
 
-app.add_url_rule('/units/', view_func=UnitsAPI.as_view('units'))
-app.add_url_rule('/ingredients/', view_func=IngredientsAPI.as_view('ingredients'))
-app.add_url_rule('/recipes/', view_func=RecipesAPI.as_view('recipes'))
+app.add_url_rule('/units', view_func=UnitsAPI.as_view('units'))
+app.add_url_rule('/ingredients', view_func=IngredientsAPI.as_view('ingredients'))
+app.add_url_rule('/recipes', view_func=RecipesAPI.as_view('recipes'))
 app.add_url_rule('/auth/login', view_func=LoginAPI.as_view('login'))
 app.add_url_rule('/auth/logout', view_func=LogoutAPI.as_view('logout'))
 app.add_url_rule('/auth/register', view_func=RegisterAPI.as_view('register'))
