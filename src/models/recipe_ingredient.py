@@ -1,5 +1,7 @@
+from __future__ import annotations
 from sqlalchemy import Column, ForeignKey, Integer
 from sqlalchemy.dialects.postgresql import UUID
+from typing import List
 
 from src.db import Base, db_session
 from src.models.ingredient import Ingredient
@@ -45,3 +47,7 @@ class RecipeIngredient(Base):
         if not self.id:
             db_session.add(self)
         db_session.commit()
+
+    @staticmethod
+    def get_by_recipe(recipe_id) -> List[RecipeIngredient]:
+        return RecipeIngredient.query.filter_by(recipe=recipe_id)

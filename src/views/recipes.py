@@ -26,6 +26,7 @@ recipe_schema = RecipeSchema()
 
 
 def parse_ingredients(ingredient_item, recipe: Recipe):
+    """Create a recipe-ingredient relation row"""
     ingredient_id = ingredient_item.get("ingredient")
     
     if not is_valid_uuid(ingredient_id):
@@ -41,9 +42,6 @@ def parse_ingredients(ingredient_item, recipe: Recipe):
             jsonify({"errors": f"ingredient with id {ingredient} does not exist"}), 400
         )
         abort(response)
-    
-    # recipe.save()   # save once we are sure there won't be errors
-    # print(recipe.id)
 
     amount = ingredient_item.get("amount")
 
@@ -58,7 +56,15 @@ def parse_ingredients(ingredient_item, recipe: Recipe):
 class RecipesAPI(MethodView):
     def get(self):
         recipes = Recipe.all()
-        return jsonify([recipe.json() for recipe in recipes])
+        
+        result = []
+        for recipe in recipes:
+            recipe_json = recipe.json()
+            ingredients = RecipeIngredient.get_by_recipe(recipe.id)
+            recipe_json["ingredients"] = [ingredient.json() for ingredient in ingredients]
+            result.append(recipe_json)
+        
+        return jsonify(result)
 
     def post(self):
         json_data = request.get_json()
