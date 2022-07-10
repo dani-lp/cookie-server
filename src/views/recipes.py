@@ -25,6 +25,13 @@ class RecipeSchema(Schema):
 recipe_schema = RecipeSchema()
 
 
+def load_ingredients(recipe: Recipe):
+    recipe_json = recipe.json()
+    ingredients = RecipeIngredient.get_by_recipe(recipe.id)
+    recipe_json["ingredients"] = [ingredient.json() for ingredient in ingredients]
+    return recipe_json
+
+
 def parse_ingredients(ingredient_item, recipe: Recipe):
     """Create a recipe-ingredient relation row"""
     ingredient_id = ingredient_item.get("ingredient")
@@ -54,17 +61,14 @@ def parse_ingredients(ingredient_item, recipe: Recipe):
 
 
 class RecipesAPI(MethodView):
-    def get(self):
-        recipes = Recipe.all()
-        
-        result = []
-        for recipe in recipes:
-            recipe_json = recipe.json()
-            ingredients = RecipeIngredient.get_by_recipe(recipe.id)
-            recipe_json["ingredients"] = [ingredient.json() for ingredient in ingredients]
-            result.append(recipe_json)
-        
-        return jsonify(result)
+    def get(self, recipe_id):
+        if recipe_id is None:
+            recipes = Recipe.all()
+            result = [load_ingredients(recipe) for recipe in recipes]
+            return jsonify(result)
+        else:
+            recipe = Recipe.get(recipe_id)
+            return jsonify(load_ingredients(recipe))
 
     def post(self):
         json_data = request.get_json()
