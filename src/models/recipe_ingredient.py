@@ -30,7 +30,7 @@ class RecipeIngredient(Base):
         entry = {col.name: getattr(self, col.name) for col in self.__table__.columns}
         del entry["recipe"]
         del entry["id"]
-        
+
         ingredient = Ingredient.get(self.ingredient)
         entry["ingredient"] = ingredient.name
         entry["ingredient_id"] = str(ingredient.id)

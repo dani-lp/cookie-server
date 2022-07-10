@@ -19,17 +19,15 @@ class User(Base):
     # fridge_entries = relationship(
     #     "FridgeEntry", backref=backref("fridge_entry"), cascade="all, delete"
     # )
-    recipes = relationship(
-        "Recipe", cascade="all, delete"
-    )
+    recipes = relationship("Recipe", cascade="all, delete", backref=backref("User"))
 
     def __init__(self, username: str, password: str, email: str):
         self.username = username
         self.email = email
-        
-        pwd_hash = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())
-        self.password = pwd_hash.decode('utf8')
-        
+
+        pwd_hash = bcrypt.hashpw(password.encode("utf8"), bcrypt.gensalt())
+        self.password = pwd_hash.decode("utf8")
+
         # to check: bcrypt.checkpw(pwd_bytes, pwd_hash)
 
     # TODO check if the UUID conversion can be carried out in the comprehension
@@ -54,7 +52,7 @@ class User(Base):
     @staticmethod
     def get_by_email(user_email) -> User:
         return User.query.filter_by(email=user_email).first()
-    
+
     @staticmethod
     def email_exists(user_email) -> bool:
         return User.query.filter_by(email=user_email).first() is not None

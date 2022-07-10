@@ -1,5 +1,6 @@
 from __future__ import annotations
 from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy.orm import backref, relationship
 from sqlalchemy.dialects.postgresql import TEXT, UUID
 from typing import List
 
@@ -17,6 +18,9 @@ class Recipe(Base):
 
     user = Column(
         UUID(as_uuid=True), ForeignKey("user.id", ondelete="CASCADE"), nullable=False
+    )
+    ingredients = relationship(
+        "RecipeIngredient", cascade="all, delete", backref=backref("Recipe")
     )
 
     def __init__(self, title: str, content: str, cook_minutes: int, user: User):
