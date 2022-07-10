@@ -4,8 +4,10 @@ from sqlalchemy.orm import backref, relationship
 from sqlalchemy.dialects.postgresql import TEXT, UUID
 from typing import List
 
-from src.models.user import User
 from src.db import Base, db_session
+from src.models.user import User
+from src.utils.helper import camelize
+
 import uuid
 
 
@@ -32,7 +34,10 @@ class Recipe(Base):
 
     # TODO check if the UUID conversion can be carried out in the comprehension
     def json(self):
-        recipe = {col.name: getattr(self, col.name) for col in self.__table__.columns}
+        recipe = {
+            camelize(col.name): getattr(self, col.name)
+            for col in self.__table__.columns
+        }
         recipe["id"] = str(recipe["id"])
         recipe["user"] = str(recipe["user"])
         return recipe

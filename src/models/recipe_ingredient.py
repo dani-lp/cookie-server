@@ -35,7 +35,7 @@ class RecipeIngredient(Base):
 
         ingredient = Ingredient.get(self.ingredient)
         entry["ingredient"] = ingredient.name
-        entry["ingredient_id"] = str(ingredient.id)
+        entry["ingredientId"] = str(ingredient.id)
         entry["unit"] = Unit.get(ingredient.unit).name
         return entry
 
