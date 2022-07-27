@@ -29,9 +29,7 @@ class IngredientsAPI(MethodView):
         except ValidationError as err:
             return err.messages, 400
 
-        unit = Unit.get(data.get("unit"))
-
-        ingredient = Ingredient(name=data.get("name"), unit=unit)
+        ingredient = Ingredient(name=data.get("name"), unit=data.get("unit"))
         ingredient.save()
 
         return ingredient.json(), 201

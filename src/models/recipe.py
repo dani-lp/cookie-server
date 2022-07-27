@@ -17,6 +17,7 @@ class Recipe(Base):
     title = Column(String(255), nullable=False)
     content = Column(TEXT(), nullable=False)
     cook_minutes = Column(Integer(), nullable=True)
+    image_url = Column(String(255), nullable=True)
 
     user = Column(
         UUID(as_uuid=True), ForeignKey("user.id", ondelete="CASCADE"), nullable=False
@@ -25,11 +26,12 @@ class Recipe(Base):
         "RecipeIngredient", cascade="all, delete", backref=backref("Recipe")
     )
 
-    def __init__(self, title: str, content: str, cook_minutes: int, user: User):
+    def __init__(self, title: str, content: str, cook_minutes: int, image_url: string, user: User):
         # self.id = uuid.uuid4()
         self.title = title
         self.content = content
         self.cook_minutes = cook_minutes
+        self.image_url = image_url
         self.user = user
 
     # TODO check if the UUID conversion can be carried out in the comprehension

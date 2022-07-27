@@ -35,6 +35,7 @@ class Ingredient(Base):
         }
         ingredient["id"] = str(ingredient["id"])
         ingredient["unit"] = str(ingredient["unit"])
+        ingredient["unitName"] = str(Unit.get(ingredient.get("unit")).name)
         return ingredient
 
     def __repr__(self):

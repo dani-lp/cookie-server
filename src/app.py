@@ -1,5 +1,5 @@
 from crypt import methods
-from flask import Flask
+from flask import Flask 
 from flask_cors import CORS
 from src.config import app_secret
 from src.db import init_db, db_session
@@ -54,7 +54,7 @@ app.add_url_rule("/auth/logout", view_func=LogoutAPI.as_view("logout"))
 app.add_url_rule("/auth/register", view_func=RegisterAPI.as_view("register"))
 app.add_url_rule("/auth/self", view_func=UsersSelfAPI.as_view("self"))
 
-register_api(RecipesAPI, "recipes_api", "/recipes/", pk="recipe_id", pk_type="string")
+register_api(RecipesAPI, "recipes_api", "/recipes", pk="recipe_id", pk_type="string")
 
 
 if __name__ == "__main__":

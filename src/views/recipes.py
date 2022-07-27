@@ -17,7 +17,8 @@ class RecipeSchema(Schema):
     id = fields.Str(dump_only=True)
     title = fields.Str(required=True)
     content = fields.Str(required=True)
-    cook_minutes = fields.Int(required=True)  # TODO make it nullable
+    cookMinutes = fields.Int(required=True)  # TODO make it nullable
+    imageUrl = fields.Str(required=False)
     user = fields.Str(required=True)
     ingredients = fields.List(fields.Nested(RecipeIngredientSchema), required=True)
 
@@ -85,10 +86,13 @@ class RecipesAPI(MethodView):
         if not user:
             return {"error": "unauthorized (JWT error)"}, 401
 
+        imageUrl = data.get("imageUrl")
+
         recipe = Recipe(
             title=data.get("title"),
             content=data.get("content"),
             cook_minutes=data.get("cook_minutes"),  # TODO make it nullable
+            image_url=imageUrl,
             user=user.id,
         )
         recipe.save()
